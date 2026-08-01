@@ -1,10 +1,8 @@
 // --- Page Navigation ---
 function nextPage(pageNum) {
-  // Hide all pages
   document.querySelectorAll('.page').forEach(page => {
     page.classList.remove('active');
   });
-  // Show target page
   document.getElementById('page' + pageNum).classList.add('active');
 }
 
@@ -13,22 +11,21 @@ let counterInterval;
 
 function startCounter() {
   const dateInput = document.getElementById('specialDate').value;
+  
+  // Validation: User must choose a date
   if (!dateInput) {
-    alert("Please select our special date first! ❤️");
+    alert("Pehle humari special date choose toh karo! ❤️");
     return;
   }
 
   const specialDate = new Date(dateInput);
   
-  // Clear any existing interval
   if (counterInterval) clearInterval(counterInterval);
 
   function updateCounter() {
     const now = new Date();
-    // Calculate difference (assuming past date or automatic past adjustment)
     let diff = now - specialDate;
     
-    // If date is in future, show zeros or handle gracefully
     if (diff < 0) diff = 0;
 
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -42,49 +39,57 @@ function startCounter() {
     document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
   }
 
-  updateCounter(); // initial call
-  counterInterval = setInterval(updateCounter, 1000); // update every second
-  nextPage(3); // move to counter page
+  updateCounter();
+  counterInterval = setInterval(updateCounter, 1000);
+  nextPage(3); // Move to counter page
 }
 
 // --- Photo Slider Logic ---
 let currentSlide = 0;
-const slides = document.querySelectorAll('#page5 .slide');
 
 function changeSlide(direction) {
+  const slides = document.querySelectorAll('#page5 .slide');
+  if (slides.length === 0) return;
+  
   slides[currentSlide].classList.remove('active');
   currentSlide = (currentSlide + direction + slides.length) % slides.length;
   slides[currentSlide].classList.add('active');
 }
 
-// Optional: Add Swipe support for mobile
+// Mobile Touch Swipe Support
 let touchstartX = 0;
 let touchendX = 0;
-const sliderZone = document.querySelector('.slider-container');
 
-sliderZone.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; });
-sliderZone.addEventListener('touchend', e => { 
-  touchendX = e.changedTouches[0].screenX; 
-  handleSwipe();
+document.addEventListener('DOMContentLoaded', () => {
+  const sliderZone = document.querySelector('.slider-container');
+  if (sliderZone) {
+    sliderZone.addEventListener('touchstart', e => { 
+      touchstartX = e.changedTouches[0].screenX; 
+    });
+    sliderZone.addEventListener('touchend', e => { 
+      touchendX = e.changedTouches[0].screenX; 
+      handleSwipe();
+    });
+  }
 });
 
 function handleSwipe() {
-  if (touchendX < touchstartX - 50) changeSlide(1); // swipe left -> next
-  if (touchendX > touchstartX + 50) changeSlide(-1); // swipe right -> prev
+  if (touchendX < touchstartX - 50) changeSlide(1);  // Swipe left -> next
+  if (touchendX > touchstartX + 50) changeSlide(-1); // Swipe right -> prev
 }
 
 // --- Final Screen & Fireworks ---
 function finalScreen() {
   nextPage(6);
-  initFireworks(); // Start fireworks only on final page
+  initFireworks();
 }
 
 // --- Fireworks Animation Code ---
 function initFireworks() {
   const canvas = document.getElementById('fireworksCanvas');
-  const ctx = canvas.getContext('2d');
+  if (!canvas) return;
   
-  // Set canvas size to full screen
+  const ctx = canvas.getContext('2d');
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
@@ -104,7 +109,7 @@ function initFireworks() {
     update() {
       this.x += this.sx;
       this.y += this.sy;
-      this.sy += 0.02; // gravity
+      this.sy += 0.02;
       if (this.sy >= 0 && !this.exploded) {
         this.explode();
         this.exploded = true;
@@ -113,7 +118,7 @@ function initFireworks() {
     draw() {
       ctx.fillStyle = this.color;
       ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size, 0, Math.random() * Math.PI * 2);
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
       ctx.fill();
     }
     explode() {
@@ -136,7 +141,7 @@ function initFireworks() {
     update() {
       this.x += this.sx;
       this.y += this.sy;
-      this.sy += 0.03; // gravity
+      this.sy += 0.03;
       this.life -= 1;
     }
     draw() {
@@ -151,7 +156,7 @@ function initFireworks() {
 
   function animate() {
     if (!document.getElementById('page6').classList.contains('active')) return;
-    ctx.fillStyle = 'rgba(13, 1, 17, 0.2)'; // Clear trace
+    ctx.fillStyle = 'rgba(13, 1, 17, 0.2)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     if (Math.random() < 0.05) fireworks.push(new Firework());
@@ -171,11 +176,10 @@ function initFireworks() {
     requestAnimationFrame(animate);
   }
 
-  // Handle Resize
   window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   });
 
   animate();
-    }
+              }
